@@ -21,6 +21,13 @@ public:
         }
         return instance;
     }
+    static bool deleteInstance() {
+        if(instance != NULL) {
+            delete instance;
+            return true;
+        }
+        return false;
+    }
     string getTime() {
         time_t rawtime;
         struct tm * timeinfo;
