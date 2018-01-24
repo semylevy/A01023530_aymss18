@@ -5,8 +5,13 @@ using namespace std;
 class Movil {
 public:
     virtual Movil* clone() = 0;
-    void encender() {}
-    void apagar() {}
+    virtual void print() = 0;
+    void encender() {
+        *status = true;
+    }
+    void apagar() {
+        *status = false;
+    }
     void reiniciar() {}
     void restaurar() {}
     
@@ -39,7 +44,7 @@ public:
     }
     // Print all parameters
     void print() {
-        cout << "\tTablet\nBateria: " << *bateria << "\nStatus: " << *status << "\nSerie: " << serie << "\nModelo: " << modelo << "\n";
+        cout << "**** Tablet ****\nBateria: " << *bateria << "\nStatus: " << *status << "\nSerie: " << serie << "\nModelo: " << modelo << "\nPantalla: " << *pantalla << "\n";
     }
 private:
     int* pantalla;
@@ -63,6 +68,10 @@ public:
     Movil* clone() {
         return new Smartphone(*this);
     }
+    // Print all parameters
+    void print() {
+        cout << "**** Smartphone ****\nBateria: " << *bateria << "\nStatus: " << *status << "\nSerie: " << serie << "\nModelo: " << modelo << "\nSeñal: " << *senal << "\n";
+    }
 private:
     int* senal;
 };
@@ -85,12 +94,35 @@ public:
     Movil* clone() {
         return new Smartwatch(*this);
     }
+    // Print all parameters
+    void print() {
+        cout << "**** Smartwatch ****\nBateria: " << *bateria << "\nStatus: " << *status << "\nSerie: " << serie << "\nModelo: " << modelo << "\nHora: " << *hora << "\n";
+    }
 private:
     int* hora;
 };
 
 int main() {
-    Movil *t1 = new Tablet(1,2,3,4,5);
+    Movil *t1 = new Tablet(1,false,3,4,5);
+    Movil *s1 = new Smartphone(5,false,3,2,1);
+    Movil *w1 = new Smartwatch(1,false,1,1,1);
+    
+    t1->encender();
+    s1->encender();
+    
+    Movil *t2 = t1->clone();
+    Movil *s2 = s1->clone();
+    Movil *w2 = w1->clone();
+    
+    s2->apagar();
+    w2->encender();
+    
+    t1->print();
+    t2->print();
+    s1->print();
+    s2->print();
+    w1->print();
+    w2->print();
     
     return 1;
 }
