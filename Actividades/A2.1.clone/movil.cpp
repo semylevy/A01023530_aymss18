@@ -22,14 +22,31 @@ public:
     
     Movil() {}
     Movil(float bateria, bool status, int serie, int modelo) : bateria(new float(bateria)), status(new bool(status)), serie(serie), modelo(modelo) {}
+    
+    void setValues(float bateria_in, bool status_in, int serie_in, int modelo_in) {
+        bateria = new float(bateria_in);
+        status = new bool(status_in);
+        serie = serie_in;
+        modelo = modelo_in;
+    }
 };
 
-class Tablet : public Movil {
+template <class Base, class Subclass>
+class CloneCRTP : public Base {
+public:
+    Base* clone() {
+        return new Subclass(dynamic_cast<Subclass&>(*this));
+    }
+};
+
+class Tablet : public CloneCRTP<Movil, Tablet> {
 public:
     // Default constructor
     Tablet() {};
     // Argument constructor
-    Tablet(float bateria, bool status, int serie, int modelo, int pantalla) : Movil(bateria, status, serie, modelo), pantalla(new int (pantalla)) {}
+    Tablet(float bateria, bool status, int serie, int modelo, int pantalla) : pantalla(new int (pantalla)) {
+        Movil::setValues(bateria, status, serie, modelo);
+    }
     // Copy constructor
     Tablet(const Tablet& t) {
         bateria = new float(*(t.bateria));
@@ -37,10 +54,6 @@ public:
         serie = t.serie;
         modelo = t.modelo;
         pantalla = new int(*(t.pantalla));
-    }
-    // Clone implementation
-    Movil* clone() {
-        return new Tablet(*this);
     }
     // Print all parameters
     void print() {
@@ -50,12 +63,14 @@ private:
     int* pantalla;
 };
 
-class Smartphone : public Movil {
+class Smartphone : public CloneCRTP<Movil, Smartphone>{
 public:
     // Default Constructor
     Smartphone() {};
     // Argument Constructor
-    Smartphone(float bateria, bool status, int serie, int modelo, int senal) : Movil(bateria, status, serie, modelo), senal(new int(senal)) {}
+    Smartphone(float bateria, bool status, int serie, int modelo, int senal) : senal(new int(senal)) {
+        Movil::setValues(bateria, status, serie, modelo);
+    }
     // Copy Constructor
     Smartphone(const Smartphone& t) {
         bateria = new float(*(t.bateria));
@@ -63,10 +78,6 @@ public:
         serie = t.serie;
         modelo = t.modelo;
         senal = new int(*(t.senal));
-    }
-    // Clone implementation
-    Movil* clone() {
-        return new Smartphone(*this);
     }
     // Print all parameters
     void print() {
@@ -76,12 +87,14 @@ private:
     int* senal;
 };
 
-class Smartwatch : public Movil {
+class Smartwatch : public CloneCRTP<Movil, Smartwatch> {
 public:
     // Default Constructor
     Smartwatch() {};
     // Argument Constructor
-    Smartwatch(float bateria, bool status, int serie, int modelo, int hora) : Movil(bateria, status, serie, modelo), hora(new int(hora)) {}
+    Smartwatch(float bateria, bool status, int serie, int modelo, int hora) : hora(new int(hora)) {
+        Movil::setValues(bateria, status, serie, modelo);
+    }
     // Copy Constructor
     Smartwatch(const Smartwatch& t) {
         bateria = new float(*(t.bateria));
@@ -89,10 +102,6 @@ public:
         serie = t.serie;
         modelo = t.modelo;
         hora = new int(*(t.hora));
-    }
-    // Clone implementation
-    Movil* clone() {
-        return new Smartwatch(*this);
     }
     // Print all parameters
     void print() {
