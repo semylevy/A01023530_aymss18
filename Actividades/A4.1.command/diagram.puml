@@ -1,0 +1,29 @@
+@startuml
+
+class Caller{
+
+}
+
+class Command{
+    execute()
+}
+
+class Client{
+
+}
+
+class Receiver{
+
+}
+
+class ConcreteCommand{
+    state
+    execute()
+}
+
+Command <|-- ConcreteCommand
+Receiver <-- Client
+ConcreteCommand <-- Client
+Command <--* Caller
+Receiver <-- ConcreteCommand
+@enduml 
