@@ -1,0 +1,18 @@
+@startuml
+
+left to right direction
+skinparam packageStyle rectangle
+actor Osbert
+actor Sistema
+actor Cliente
+rectangle Compra {
+  Osbert -- (introducir datos)
+  (búsqueda de registros) -- (Sistema)
+  (búsqueda de registros) .> (cálculo de precio) : <<include>>
+  (cálculo de precio) .> (realizar oferta) : <<extend>>
+  (cálculo de precio) -- Sistema
+  (realizar oferta) -- Cliente
+  (realizar oferta) -- Sistema
+}
+
+@enduml
