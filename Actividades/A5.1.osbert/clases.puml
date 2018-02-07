@@ -29,7 +29,7 @@ class Cuadro {
 class Cliente {
     -string nombre
     -string direccion
-    +float getPrecio(Cuadro)
+    +float getOferta(Cuadro)
     +bool comprar(Cuadro)
 }
 
@@ -46,6 +46,6 @@ Venta --> Subastas
 Cliente --* Venta
 Cuadro --o Subasta
 Venta --> Cuadro
-
+Cliente --> Galeria
 
 @enduml
