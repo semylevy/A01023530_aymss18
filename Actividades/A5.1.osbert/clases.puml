@@ -3,31 +3,42 @@
 class Galeria {
     -Ventas historial
     +float getOferta(Cuadro)
-    +bool vender(Cuadro, Cliente, float precio)
-    +float calculaPrecio(Cuadro)
+    +bool vender(Cuadro, Cliente, float precio, int year)
+    +float calculaPrecio(Venta)
+    +void imprimirVentas()
 }
 
 class Ventas {
     -vector<Venta> lista_ventas
-    +Venta getSimilar(Cuadro)
+    +Venta getSimilares(Cuadro)
+    +void imprimir()
+    +void nuevaVenta(Venta)
 }
 
 class Cuadro {
     -string autor
+    -string nombre
     -float precio_inicial
+    +string getAutor()
+    +string getNombre()
+    +float getPrecio()
 }
 
 class Cliente {
     -string nombre
     -string direccion
+    +string getNombre()
 }
 
 class Venta {
     -float precio
-    -date fecha
+    -int year
     -Cuadro pintura
     -Cliente comprador
-    +float generaPrecio()
+    +void imprimir()
+    +string getAutor()
+    +int getYear()
+    +float getPrecio()
 }
 
 Galeria --* Ventas
