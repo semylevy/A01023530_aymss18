@@ -1,51 +1,38 @@
 @startuml
 
 class Galeria {
-    -vector<Cliente> clientes
-    -Subastas historial
+    -Ventas historial
+    +float getOferta(Cuadro)
+    +bool vender(Cuadro, Cliente, float precio)
+    +float calculaPrecio(Cuadro)
 }
 
-class Subastas {
-    -vector<Subasta> lista_de_subastas
-    +Subasta getSimilar(string autor, date fecha)
-}
-
-class Subasta {
-    -Cuadro pintura
-    -date fecha
-    -Cliente comprador
-    +string getAutor()
-    +date getFecha()
-    +float getPrecio()
+class Ventas {
+    -vector<Venta> lista_ventas
+    +Venta getSimilar(Cuadro)
 }
 
 class Cuadro {
     -string autor
-    -float precio
-    -bool vendido
-    +void crearCuadro(string autor, float precio)
+    -float precio_inicial
 }
 
 class Cliente {
     -string nombre
     -string direccion
-    +float getOferta(Cuadro)
-    +bool comprar(Cuadro)
 }
 
 class Venta {
-    -int precio
+    -float precio
     -date fecha
     -Cuadro pintura
     -Cliente comprador
     +float generaPrecio()
 }
 
-Subastas o-- Subasta
-Venta --> Subastas
-Cliente --* Venta
-Cuadro --o Subasta
+Galeria --* Ventas
+Ventas --* Venta
 Venta --> Cuadro
-Cliente --> Galeria
+Venta --> Cliente
 
 @enduml
