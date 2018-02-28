@@ -1,0 +1,16 @@
+@startuml
+
+left to right direction
+skinparam packageStyle rectangle
+actor Admin
+actor Sistema
+rectangle Contacto {
+  Admin -- (Obtener datos de archivo)
+  Sistema -- (Obtener datos de archivo)
+  (Obtener datos de archivo) .> (Creación de clientes) : <<include>>
+  (Creación de clientes) -- (Sistema)
+  (Enviar info) -- Sistema
+  (Enviar info) -- Admin
+}
+
+@enduml

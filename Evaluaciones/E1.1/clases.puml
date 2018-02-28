@@ -1,0 +1,69 @@
+@startuml
+
+class Tienda {
+    -vector<Cliente> clientes
+    +static Tienda* getInstance()
+    +static bool deleteInstance()
+    +void readFromFile()
+    +void printClients()
+    +void contactarTodos()
+}
+
+class Cliente {
+    -string id
+    -string cus_name
+    -string cus_last
+    -string type_comm
+    -string mail
+    -string phone_num
+    -string calle
+    -string numero
+    -string colonia
+    +void contactar()
+    +void print()
+}
+
+class ccEmail {
+    +void contact()
+    -Receiver *r
+}
+
+class ccTelefono {
+    +void contact()
+    -Receiver *r
+}
+
+class ccSMS {
+    +void contact()
+    -Receiver *r
+}
+
+class Caller {
+   +void setCommand()
+   +void executeAction()
+   -Command *command
+}
+class Receiver {
+    +void enviaEmail()
+    +void enviaSMS()
+    +void llamaTelefono()
+}
+
+class Command {
+    +virtual void execute()
+}
+
+Command <|-- ccTelefono
+Command <|-- ccSMS
+Command <|-- ccEmail
+Receiver <-- Cliente
+ccTelefono <-- Cliente
+ccSMS <-- Cliente
+ccEmail <-- Cliente
+Command <--* Caller
+Receiver <-- ccTelefono
+Receiver <-- ccEmail
+Receiver <-- ccSMS
+Cliente <-- Tienda
+
+@enduml
