@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -95,7 +96,7 @@ public:
     }
     // Print all parameters
     void print() {
-        cout << "Atr 1: " << in_atr << ", num serie: " << serie << " precio: " << precio << " nombre: " << nombre << "\n";
+        cout << "Atr 1: " << in_atr << ", num serie: " << serie << ", precio: " << precio << ", nombre: " << nombre << ". Estrategia.\n";
     }
     void accept(IVisitor* visitor);
     void notificar() {
@@ -121,7 +122,8 @@ public:
     }
     // Print all parameters
     void print() {
-    cout << "Atr 1: " << in_atr << ", num serie: " << serie << " precio: " << precio << " nombre: " << nombre << "\n";    }
+        cout << "Atr 1: " << in_atr << ", num serie: " << serie << ", precio: " << precio << ", nombre: " << nombre << ". Aventura.\n";
+    }
     void accept(IVisitor* visitor);
     void notificar() {
         notifyAll(this);
@@ -146,7 +148,7 @@ public:
     }
     // Print all parameters
     void print() {
-        cout << "Atr 1: " << in_atr << ", num serie: " << serie << " precio: " << precio << " nombre: " << nombre << "\n";
+        cout << "Atr 1: " << in_atr << ", num serie: " << serie << ", precio: " << precio << ", nombre: " << nombre << ". Aprendizaje.\n";
     }
     void accept(IVisitor* visitor);
     void notificar() {
@@ -340,30 +342,179 @@ public:
 Creator* Creator::instance = NULL;
 Almacen* Almacen::instance = NULL;
 
+void menuNuevoVJ(Creator* creador, Almacen* almacen) {
+    int seleccion, serie, cust;
+    float precio;
+    string nombre;
+    Videojuego *v;
+    cout << "Selecciona el tipo de juego:\n1 - Estrategia\n2 - Aventura\n3 - Aprendizaje\n";
+    cin >> seleccion;
+    cout << "Ingresa parámetro específico:\n";
+    cin >> cust;
+    cout << "Ingresa el número de serie:\n";
+    cin >> serie;
+    cout << "Ingresa el precio:\n";
+    cin >> precio;
+    cout << "Ingresa el nombre:\n";
+    cin.ignore();
+    getline(cin, nombre);
+    switch(seleccion) {
+        case 1:
+            v = creador->crearVideojuego<Estrategia>(cust,serie,precio,nombre);
+            break;
+        case 2:
+            v = creador->crearVideojuego<Aventura>(cust,serie,precio,nombre);
+            break;
+        case 3:
+            v = creador->crearVideojuego<Aprendizaje>(cust,serie,precio,nombre);
+            break;
+        default:
+            return;
+    }
+    almacen->agregarJuego(v);
+}
+
+void menuEliminar(Almacen* almacen) {
+    int seleccion, serie;
+    string nombre;
+    cout << "Seleccione el método de búsqueda\n1 - Nombre\n2 - Número de serie\n";
+    cin >> seleccion;
+    switch(seleccion) {
+        case 1:
+            cout << "Ingrese nombre del videojuego:\n";
+            cin.ignore();
+            getline(cin, nombre);
+            if(almacen->eliminarJuegoNombre(nombre)) {
+                cout << "Eliminado exitosamente\n";
+            } else {
+                cout << "Juego no encontrado\n";
+            }
+            break;
+        case 2:
+            cout << "Ingrese el número de serie del videojuego:\n";
+            cin >> serie;
+            if(almacen->eliminarJuegoSerie(serie)) {
+                cout << "Eliminado exitosamente\n";
+            } else {
+                cout << "Juego no encontrado\n";
+            }
+            break;
+        default:
+            return;
+    }
+}
+
+void menuOrdenar(Almacen* almacen) {
+    int seleccion;
+    cout << "Seleccione el orden deseado:\n1 - Ascendiente\n2 - Descendiente\n";
+    cin >> seleccion;
+    switch(seleccion) {
+        case 1:
+            almacen->ordenarInventario(true);
+            break;
+        case 2:
+            almacen->ordenarInventario(false);
+            break;
+        default:
+            return;
+    }
+}
+
+void menuBuscar(Almacen* almacen) {
+    int seleccion, serie;
+    string nombre;
+    Videojuego *v;
+    cout << "Seleccione el método de búsqueda\n1 - Nombre\n2 - Número de serie\n";
+    cin >> seleccion;
+    switch(seleccion) {
+        case 1:
+            cout << "Ingrese nombre del videojuego:\n";
+            cin.ignore();
+            getline(cin, nombre);
+            v = almacen->buscarJuegoNombre(nombre);
+            if(v) {
+                cout << "Encontrado:\n";
+                v->print();
+            } else {
+                cout << "Juego no encontrado\n";
+            }
+            break;
+        case 2:
+            cout << "Ingrese el número de serie del videojuego:\n";
+            cin >> serie;
+            v = almacen->buscarJuegoSerie(serie);
+            if(v) {
+                cout << "Encontrado:\n";
+                v->print();
+            } else {
+                cout << "Juego no encontrado\n";
+            }
+            break;
+        default:
+            return;
+    }
+}
+
+void menuCambioPrecio(Almacen* almacen) {
+    int seleccion;
+    cout << "Elije la el ajuste de precio deseado:\n1 - Aumentar 15%\n2 - Reducir 15%\n";
+    cin >> seleccion;
+    switch(seleccion) {
+        case 1:
+            almacen->operacionPrecios(true);
+            break;
+        case 2:
+            almacen->operacionPrecios(false);
+            break;
+        default:
+            return;
+    }
+}
+
+void menuPrincipal(Creator* creador, Almacen* almacen) {
+    int seleccion = 0;
+    while(seleccion != 9) {
+        cout << "Bienvenido a Jueg A.S.\n-------------------------------\n1 - Crear videojuego\n2 - Eliminar videojuego\n3 - Deshacer últimas tres operaciones\n4 - Ordenar inventario\n5 - Buscar\n6 - Número total de videojuegos\n7 - Imprimir inventario\n8 - Aplicar cambio de precio\n9 - Salir\n";
+        cin >> seleccion;
+        switch(seleccion) {
+            case 1:
+                menuNuevoVJ(creador, almacen);
+                break;
+            case 2:
+                menuEliminar(almacen);
+                break;
+            case 3:
+                break;
+            case 4:
+                menuOrdenar(almacen);
+                break;
+            case 5:
+                menuBuscar(almacen);
+                break;
+            case 6:
+                almacen->getNumeroDeJuegos();
+                break;
+            case 7:
+                almacen->imprimirInventario();
+                break;
+            case 8:
+                menuCambioPrecio(almacen);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 int main() {
     Creator* creador = Creator::getInstance();
     Almacen* almacen = Almacen::getInstance();
 
     Publico* publico = new Publico;
 
-    Videojuego *t1 = creador->crearVideojuego<Estrategia>(1,1,1,"test");
-    Videojuego *s1 = creador->crearVideojuego<Aventura>(1,1,1,"test");
-    Videojuego *w1 = creador->crearVideojuego<Aprendizaje>(1,1,1,"test");
-    
-    Videojuego *t2 = t1->clone();
-    Videojuego *s2 = s1->clone();
-    Videojuego *w2 = w1->clone();
+    menuPrincipal(creador, almacen);
 
-    almacen->agregarJuego(t1);
-    almacen->agregarJuego(s1);
-    almacen->agregarJuego(w1);
-    almacen->agregarJuego(t2);
-    almacen->agregarJuego(s2);
-    almacen->agregarJuego(w2);
-
-    almacen->operacionPrecios(true);
-    almacen->ordenarInventario(false);
-    almacen->imprimirInventario();
+    //Videojuego *s2 = s1->clone();
     
     return 1;
 }
