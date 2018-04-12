@@ -4,6 +4,15 @@ class Observer {
     +virtual void update(Videojuego*) = 0;
 }
 
+class Proxy {
+    -static Proxy* instance;
+    -queue<Videojuego*> queue;
+    +static Proxy* getInstance()
+    +bool eliminarVideoJuego(vector<Videojuego*>& inventario, int index)
+    +void addToDeleted(Videojuego* v)
+    +Videojuego* getFrontPop()
+}
+
 class Videojuego {
     +virtual Videojuego* clone() = 0;
     +virtual void accept(IVisitor*) = 0;
@@ -117,5 +126,6 @@ Almacen --|> Videojuego
 Creator --* Videojuego
 Videojuego --|> IVisitor
 Videojuego --|> Observer
+Proxy --|> Videojuego
 
 @enduml
