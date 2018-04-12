@@ -9,6 +9,7 @@ using namespace std;
 
 class IVisitor;
 class Videojuego;
+class Almacen;
 
 class Observer {
 public:
@@ -20,7 +21,7 @@ public:
     virtual Videojuego* clone() = 0;
     virtual void accept(IVisitor*) = 0;
     virtual void print() = 0;
-    static int* serie;
+    int serie;
 
     void concepcion() {cout << "Concepción\n";}
     void diseno() {cout << "Diseño\n";}
@@ -39,16 +40,6 @@ public:
     string nombre;
 
     Videojuego() {}
-    
-    // Singleton implementation
-    static int* getSerie() {
-        if(serie == NULL) {
-            serie = new int;
-            *serie = 0;
-        }
-        (*serie)++;
-        return serie;
-    }
 
     void setValues(float precio_in, string nombre_in) {
         precio = precio_in;
@@ -71,13 +62,6 @@ public:
             observers[i]->update(s);
         }
     }
-    bool operator > (const Videojuego& cmp) const {
-        return (precio > cmp.precio);
-    }
-    bool operator < (const Videojuego& cmp) const {
-        return (precio < cmp.precio);
-    }    
-
 private:
     vector<Observer*> observers;
 };
@@ -95,26 +79,15 @@ public:
     // Default constructor
     Estrategia() {};
     // Argument constructor
-    Estrategia(string in_atr1, string in_atr2, string in_atr3, float precio, string nombre) : fecha(in_atr1), autor(in_atr2), otro(in_atr3) {
-        Videojuego::setValues(precio, nombre);
-        serie = *(Videojuego::getSerie());
-    }
+    Estrategia(string in_atr1, string in_atr2, string in_atr3, float precio, string nombre);
     // Copy constructor
-    Estrategia(const Estrategia& t) {
-        precio = t.precio;
-        nombre = t.nombre;
-        fecha = t.fecha;
-        autor = t.autor;
-        otro = t.otro;
-        serie = *(Videojuego::getSerie());
-    }
+    Estrategia(const Estrategia& t);
     // Print all parameters
     void print() {
         cout << "Num serie: " << serie << ", precio: " << precio << ", nombre: " << nombre << ". Estrategia. " << "Atr 1: " << fecha << ", Atr 2: " << autor << ", Atr 3: " << otro << '\n';
     }
     void accept(IVisitor* visitor);
 private:
-    int serie;
     string fecha, autor, otro;
 };
 
@@ -123,26 +96,15 @@ public:
     // Default Constructor
     Aventura() {};
     // Argument Constructor
-    Aventura(string in_atr1, string in_atr2, string in_atr3, float precio, string nombre) : color(in_atr1), comp(in_atr2), otro(in_atr3) {
-        Videojuego::setValues(precio, nombre);
-        serie = *(Videojuego::getSerie());
-    }
+    Aventura(string in_atr1, string in_atr2, string in_atr3, float precio, string nombre);
     // Copy Constructor
-    Aventura(const Aventura& t) {
-        precio = t.precio;
-        nombre = t.nombre;
-        color = t.color;
-        comp = t.comp;
-        otro = t.otro;
-        serie = *(Videojuego::getSerie());
-    }
+    Aventura(const Aventura& t);
     // Print all parameters
     void print() {
         cout << "Num serie: " << serie << ", precio: " << precio << ", nombre: " << nombre << ". Aventura. " << "Atr 1: " << color << ", Atr 2: " << comp << ", Atr 3: " << otro << '\n';
     }
     void accept(IVisitor* visitor);
 private:
-    int serie;
     string color, comp, otro;
 };
 
@@ -151,26 +113,15 @@ public:
     // Default Constructor
     Aprendizaje() {};
     // Argument Constructor
-    Aprendizaje(string in_atr1, string in_atr2, string in_atr3, float precio, string nombre) : nivel(in_atr1), funcion(in_atr2), otro(in_atr3) {
-        Videojuego::setValues(precio, nombre);
-        serie = *(Videojuego::getSerie());
-    }
+    Aprendizaje(string in_atr1, string in_atr2, string in_atr3, float precio, string nombre);
     // Copy Constructor
-    Aprendizaje(const Aprendizaje& t) {
-        precio = t.precio;
-        nombre = t.nombre;
-        nivel = t.nivel;
-        funcion = t.funcion;
-        otro = t.otro;
-        serie = *(Videojuego::getSerie());
-    }
+    Aprendizaje(const Aprendizaje& t);
     // Print all parameters
     void print() {
         cout << "Num serie: " << serie << ", precio: " << precio << ", nombre: " << nombre << ". Aprendizaje. " << "Atr 1: " << nivel << ", Atr 2: " << funcion << ", Atr 3: " << otro << '\n';
     }
     void accept(IVisitor* visitor);
 private:
-    int serie;
     string nivel, funcion, otro;
 };
 
@@ -279,9 +230,26 @@ public:
     }
 };
 
+bool ascCmp(const Videojuego* a, const Videojuego* b) {
+    if(a->precio != b->precio) {
+        return a->precio < b->precio;
+    } else {
+        return a->serie < b->serie;
+    }
+}
+
+bool dscCmp(const Videojuego* a, const Videojuego* b) {
+    if(a->precio != b->precio) {
+        return a->precio > b->precio;
+    } else {
+        return a->serie < b->serie;
+    }
+}
+
 class Almacen {
 private:
     static Almacen* instance;
+    static int* serie;
     vector<Videojuego*> inventario;
     queue<Videojuego*> lastThree;
 
@@ -315,7 +283,7 @@ public:
     }
     bool eliminarJuegoSerie(int serie) {
         for(int i = 0; i < inventario.size(); i++) {
-            if(*(inventario[i]->serie) == serie) {
+            if(inventario[i]->serie == serie) {
                 return Proxy::getInstance()->eliminarVideoJuego(inventario, i);;
             }
         }
@@ -330,9 +298,9 @@ public:
     }
     void ordenarInventario(bool ascendiente) {
         if(ascendiente) {
-            sort(inventario.begin(), inventario.end());
+            sort(inventario.begin(), inventario.end(), ascCmp);
         } else {
-            sort(inventario.begin(), inventario.end(),greater<Videojuego*>());
+            sort(inventario.begin(), inventario.end(), dscCmp);
         }
     }
     Videojuego* buscarJuegoNombre(string nombre) {
@@ -345,7 +313,7 @@ public:
     }
     Videojuego* buscarJuegoSerie(int serie) {
         for(int i = 0; i < inventario.size(); i++) {
-            if(*(inventario[i]->serie) == serie) {
+            if(inventario[i]->serie == serie) {
                 return inventario[i];
             }
         }
@@ -373,7 +341,58 @@ public:
         }
         return false;
     }
+    // Singleton implementation
+    static int* getSerie() {
+        if(serie == NULL) {
+            serie = new int;
+            *serie = 0;
+        }
+        (*serie)++;
+        return serie;
+    }
 };
+
+Estrategia::Estrategia(string in_atr1, string in_atr2, string in_atr3, float precio, string nombre) : fecha(in_atr1), autor(in_atr2), otro(in_atr3) {
+    Videojuego::setValues(precio, nombre);
+    serie = *(Almacen::getSerie());
+}
+
+Estrategia::Estrategia(const Estrategia& t) {
+    precio = t.precio;
+    nombre = t.nombre;
+    fecha = t.fecha;
+    autor = t.autor;
+    otro = t.otro;
+    serie = *(Almacen::getSerie());
+}
+
+Aventura::Aventura(string in_atr1, string in_atr2, string in_atr3, float precio, string nombre) : color(in_atr1), comp(in_atr2), otro(in_atr3) {
+    Videojuego::setValues(precio, nombre);
+    serie = *(Almacen::getSerie());
+}
+
+Aventura::Aventura(const Aventura& t) {
+    precio = t.precio;
+    nombre = t.nombre;
+    color = t.color;
+    comp = t.comp;
+    otro = t.otro;
+    serie = *(Almacen::getSerie());
+}
+
+Aprendizaje::Aprendizaje(string in_atr1, string in_atr2, string in_atr3, float precio, string nombre) : nivel(in_atr1), funcion(in_atr2), otro(in_atr3) {
+    Videojuego::setValues(precio, nombre);
+    serie = *(Almacen::getSerie());
+}
+
+Aprendizaje::Aprendizaje(const Aprendizaje& t) {
+    precio = t.precio;
+    nombre = t.nombre;
+    nivel = t.nivel;
+    funcion = t.funcion;
+    otro = t.otro;
+    serie = *(Almacen::getSerie());
+}
 
 void Estrategia::accept(IVisitor* visitor) {
     visitor->visit(this);
@@ -541,7 +560,7 @@ void waitForEnter() {
 
 void menuPrincipal(Creator* creador, Almacen* almacen, Publico* publico) {
     int seleccion = 0;
-    while(seleccion != 9) {
+    do {
         cout << "Bienvenido a Jueg A.S.\n-------------------------------\n1 - Crear videojuego\n2 - Eliminar videojuego\n3 - Deshacer últimas tres operaciones\n4 - Ordenar inventario\n5 - Buscar\n6 - Número total de videojuegos\n7 - Imprimir inventario\n8 - Aplicar cambio de precio\n9 - Salir\n";
         cin >> seleccion;
         switch(seleccion) {
@@ -573,13 +592,13 @@ void menuPrincipal(Creator* creador, Almacen* almacen, Publico* publico) {
                 return;
         }
         waitForEnter();
-    }
+    } while(seleccion >= 1 && seleccion <= 8);
 }
 
 Creator* Creator::instance = NULL;
 Almacen* Almacen::instance = NULL;
+int* Almacen::serie = NULL;
 Proxy* Proxy::instance = NULL;
-int* Videojuego::serie = NULL;
 
 int main() {
     Creator* creador = Creator::getInstance();
