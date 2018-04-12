@@ -106,7 +106,7 @@ public:
         fecha = t.fecha;
         autor = t.autor;
         otro = t.otro;
-        serie = *(t.getSerie());
+        serie = *(Videojuego::getSerie());
     }
     // Print all parameters
     void print() {
@@ -134,7 +134,7 @@ public:
         color = t.color;
         comp = t.comp;
         otro = t.otro;
-        serie = *(t.getSerie());
+        serie = *(Videojuego::getSerie());
     }
     // Print all parameters
     void print() {
@@ -162,7 +162,7 @@ public:
         nivel = t.nivel;
         funcion = t.funcion;
         otro = t.otro;
-        serie = *(t.getSerie());
+        serie = *(Videojuego::getSerie());
     }
     // Print all parameters
     void print() {
@@ -245,6 +245,40 @@ public:
     }
 };
 
+class Proxy {
+private:
+    static Proxy* instance;
+    queue<Videojuego*> queue;
+    Proxy() {}
+public:
+    // Singleton implementation
+    static Proxy* getInstance() {
+        if(instance == NULL) {
+            instance = new Proxy;
+        }
+        return instance;
+    }
+    bool eliminarVideoJuego(vector<Videojuego*>& inventario, int index) {
+        addToDeleted(inventario[index]);
+        inventario.erase(inventario.begin() + index);
+        return true;
+    }
+    void addToDeleted(Videojuego* v) {
+        if(queue.size() == 3) {
+            queue.pop();
+        }
+        queue.push(v);
+    }
+    Videojuego* getFrontPop() {
+        if(queue.size() > 0) {
+            Videojuego* v = queue.front();
+            queue.pop();
+            return v;
+        }
+        return NULL;
+    }
+};
+
 class Almacen {
 private:
     static Almacen* instance;
@@ -274,9 +308,7 @@ public:
     bool eliminarJuegoNombre(string nombre) {
         for(int i = 0; i < inventario.size(); i++) {
             if(inventario[i]->nombre == nombre) {
-                addToDeleted(inventario[i]);
-                inventario.erase(inventario.begin() + i);
-                return true;
+                return Proxy::getInstance()->eliminarVideoJuego(inventario, i);
             }
         }
         return false;
@@ -284,24 +316,17 @@ public:
     bool eliminarJuegoSerie(int serie) {
         for(int i = 0; i < inventario.size(); i++) {
             if(*(inventario[i]->serie) == serie) {
-                addToDeleted(inventario[i]);
-                inventario.erase(inventario.begin() + i);
-                return true;
+                return Proxy::getInstance()->eliminarVideoJuego(inventario, i);;
             }
         }
         return false;
     }
     void deshacer() {
-        while(lastThree.size() > 0) {
-            agregarJuego(lastThree.front());
-            lastThree.pop();
+        Videojuego* v = Proxy::getInstance()->getFrontPop();
+        while(v) {
+            agregarJuego(v);
+            v = Proxy::getInstance()->getFrontPop();
         }
-    }
-    void addToDeleted(Videojuego* vg) {
-        if(lastThree.size() == 3) {
-            lastThree.pop();
-        }
-        lastThree.push(vg);
     }
     void ordenarInventario(bool ascendiente) {
         if(ascendiente) {
@@ -368,10 +393,6 @@ public:
         cout << "Escuchamos acerca de " << s->nombre << ", y estamos tan felices!\n";
     }
 };
-
-Creator* Creator::instance = NULL;
-Almacen* Almacen::instance = NULL;
-int* Videojuego::serie = NULL;
 
 void menuNuevoVJ(Creator* creador, Almacen* almacen, Publico* publico) {
     int seleccion, copias;
@@ -555,15 +576,19 @@ void menuPrincipal(Creator* creador, Almacen* almacen, Publico* publico) {
     }
 }
 
+Creator* Creator::instance = NULL;
+Almacen* Almacen::instance = NULL;
+Proxy* Proxy::instance = NULL;
+int* Videojuego::serie = NULL;
+
 int main() {
     Creator* creador = Creator::getInstance();
     Almacen* almacen = Almacen::getInstance();
+    Proxy* proxy = Proxy::getInstance();
 
     Publico* publico = new Publico;
 
     menuPrincipal(creador, almacen, publico);
-
-    //Videojuego *s2 = s1->clone();
     
     return 1;
 }
