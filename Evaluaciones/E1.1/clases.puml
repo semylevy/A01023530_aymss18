@@ -21,6 +21,8 @@ class Cliente {
     -string colonia
     +void contactar()
     +void print()
+    +virtual Caller* factoryMethod(string) = 0
+    +void addClient(string params)
 }
 
 class ccEmail {
@@ -49,6 +51,10 @@ class Receiver {
     +void llamaTelefono()
 }
 
+class ConcreteCreator{
+    +Caller* factoryMethod(string type_comm)
+}
+
 class Command {
     +virtual void execute()
 }
@@ -65,5 +71,6 @@ Receiver <-- ccTelefono
 Receiver <-- ccEmail
 Receiver <-- ccSMS
 Cliente <-- Tienda
+Cliente <|-- ConcreteCreator
 
 @enduml
