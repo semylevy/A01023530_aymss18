@@ -19,7 +19,6 @@ public:
     virtual int at(int position) = 0;
     virtual Iterator* getIterator() = 0;
     virtual int getNumElements() = 0;
-    //find() remove() missing
 };
 
 class IntArray;
@@ -54,14 +53,14 @@ public:
     }
     void add(int element) {
         if(numElems >= size) {
-            cout << "No space" << endl;
+            cout << "No more space" << endl;
             return;
         }
         array[numElems++] = element;
     }
     int at(int position) {
         if(size <= position < 0) {
-            cout << "indice no valido" << endl;
+            cout << "index not valid" << endl;
             throw "out_of_range";
         }
         return array[position];
@@ -77,11 +76,10 @@ public:
 
 int main(int argc, char const *argv[]) {
     IntCollection* c = new IntArray;
-    c->add(6);
-    c->add(8);
-    c->add(1);
     c->add(2);
-    c->add(5);
+    c->add(3);
+    c->add(14);
+    c->add(2);
     
     Iterator* i = c->getIterator();
     while( i->hasNext() ) {
